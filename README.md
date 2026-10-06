@@ -6,28 +6,46 @@ goes to the university, either through the platform or paid directly by the dono
 
 Next.js 15 (App Router, TypeScript) · Tailwind CSS v4 · Supabase (Postgres, Auth, Storage).
 
-## Getting started
+## Run it locally
+
+You need **Node.js 20+** and **Docker Desktop** (running). Docker is used by the
+Supabase CLI to run the database, login service and file storage on your machine.
 
 ```bash
+git clone https://github.com/hinahmgit/FundMyDegree.git
+cd FundMyDegree
 npm install
-cp .env.example .env.local          # fill in your Supabase URL and keys
+
+npm run db:start      # first run downloads the Supabase images (a few minutes)
+npm run db:reset      # creates the tables + countries, currencies, rates, demo universities
+npm run env:local     # writes .env.local with your local Supabase keys
+
+npm run dev           # open http://localhost:3000
 ```
 
-1. Create a Supabase project (or run `supabase start` locally).
-2. Apply the schema in order, then the reference data:
-   `supabase/migrations/0001…0006*.sql`, then `supabase/seed.sql`
-   (with the CLI: `supabase db reset` does both).
-3. In Supabase Auth settings, add `http://localhost:3000/auth/callback` to the
-   redirect URLs and enable TOTP MFA.
-4. `npm run dev` and sign up. Promote your first admin in SQL:
-   `update profiles set role = 'admin' where email = 'you@example.org';`
-5. Schedule `GET /api/cron/daily` hourly with `Authorization: Bearer $CRON_SECRET`
-   (already configured in `vercel.json` for Vercel Cron). It expires pledges and
-   sends pledge reminders.
+On Windows, run these in Git Bash or WSL (or, instead of `npm run env:local`,
+copy `.env.example` to `.env.local` and paste the API URL, anon key and
+service_role key printed by `npx supabase status`).
 
-Scripts: `npm run dev | build | lint | typecheck | test`.
-`node scripts/generate-reference-seed.mjs` regenerates countries, currencies and
-starting exchange rates.
+Then:
+
+1. **Sign up** at http://localhost:3000/signup. Email confirmation is off locally,
+   so you're logged straight in.
+2. **Make yourself admin**: `npm run make-admin -- you@example.org`, then log out
+   and back in. The Admin link appears in the header.
+3. Try the whole flow with a few accounts (use separate browser profiles or a
+   private window): a student completes their profile and uploads any PDF/image
+   as documents → admin verifies them → a donor sponsors them.
+4. **Test cards** (no real money ever moves): `4242 4242 4242 4242` succeeds,
+   `4000 0000 0000 0002` is declined, `4000 0000 0000 9995` has insufficient funds.
+   Any future expiry and any CVC.
+5. **Emails** are printed in the terminal running `npm run dev` instead of being sent.
+6. **Pledge expiry and reminders** run from a scheduled job; trigger it by hand
+   with `npm run cron` (while `npm run dev` is running).
+
+Handy extras: Supabase Studio (browse the database) is at http://localhost:54323.
+`npm run db:stop` shuts the stack down; `npm run db:reset` wipes all data and
+starts fresh. Other scripts: `npm run lint | typecheck | test | build`.
 
 ## How it's built
 
@@ -93,8 +111,10 @@ starting exchange rates.
 - `tests/e2e/flow.mjs` — a browser walkthrough of the entire lifecycle
   across student, two donors and an admin (see `tests/e2e/README.md`).
 
-### Before production
+### If you deploy it later
 
+- Schedule `GET /api/cron/daily` hourly with `Authorization: Bearer $CRON_SECRET`
+  (`vercel.json` does this on Vercel) and point `.env` at a hosted Supabase project.
 - Replace the mock provider with a real gateway that tokenizes cards in the
   browser (the interface already accepts `{ type: "token" }`); the mock form
   posts card numbers to the server and is for testing only.

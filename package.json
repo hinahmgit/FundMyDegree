@@ -8,7 +8,13 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --test --experimental-strip-types tests/*.test.ts"
+    "test": "node --test --experimental-strip-types tests/*.test.ts",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "env:local": "bash scripts/local-env.sh",
+    "make-admin": "node --env-file=.env.local scripts/make-admin.mjs",
+    "cron": "node --env-file=.env.local -e \"fetch((process.env.NEXT_PUBLIC_SITE_URL)+'/api/cron/daily',{headers:{authorization:'Bearer '+process.env.CRON_SECRET}}).then(r=>r.text()).then(console.log)\""
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -29,6 +35,7 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "^15.5.27",
     "postcss": "^8.5.29",
+    "supabase": "^2.119.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3"
   }
