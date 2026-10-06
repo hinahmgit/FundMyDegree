@@ -23,9 +23,7 @@ npm run env:local     # writes .env.local with your local Supabase keys
 npm run dev           # open http://localhost:3000
 ```
 
-On Windows, run these in Git Bash or WSL (or, instead of `npm run env:local`,
-copy `.env.example` to `.env.local` and paste the API URL, anon key and
-service_role key printed by `npx supabase status`).
+These commands work in PowerShell, Command Prompt or any terminal.
 
 Then:
 
