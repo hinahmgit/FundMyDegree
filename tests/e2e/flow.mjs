@@ -34,7 +34,6 @@ async function signup(page, { role, name, email, country, currency }) {
   await page.click("button[type=submit]");
   await page.waitForURL((u) => !u.pathname.startsWith("/signup"));
 }
-const submitIn = async (page, scope) => { await scope.locator("button[type=submit]").first().click(); await page.waitForLoadState("networkidle"); };
 
 // ── Admin ──
 const admin = await newUser();
@@ -92,8 +91,9 @@ log("student submitted", studentId);
 
 // Hidden until verified
 const anon = await newUser();
-await anon.page.goto(`${BASE}/students/${studentId}`);
-if (!(await anon.page.getByText("Page not found").isVisible())) throw new Error("unverified student is visible");
+const hidden = await anon.page.goto(`${BASE}/students/${studentId}`);
+if (hidden.status() !== 404) throw new Error("unverified student is visible");
+await anon.page.getByRole("heading", { name: "Page not found" }).waitFor({ timeout: 10000 });
 log("unverified profile hidden from public");
 
 // ── Admin verifies ──

@@ -3,6 +3,7 @@ import { getCurrentUser, dashboardPath } from "@/lib/auth";
 import { getT } from "@/i18n/server";
 import { db } from "@/lib/supabase/admin";
 import { signOut } from "@/actions/auth";
+import { LogoMark } from "@/components/logo";
 
 export async function Header() {
   const [user, t] = await Promise.all([getCurrentUser(), getT()]);
@@ -19,7 +20,10 @@ export async function Header() {
           { href: dashboardPath(user.profile.role), label: user.profile.role === "admin" ? t("nav.admin") : t("nav.dashboard") },
           ...(user.profile.role !== "admin" ? [{ href: "/messages", label: t("nav.messages") }] : []),
         ]
-      : [{ href: "/#how", label: t("nav.howItWorks") }]),
+      : [
+          { href: "/#how", label: t("nav.howItWorks") },
+          { href: "/#faq", label: t("footer.faq") },
+        ]),
   ];
 
   const bell = user && (
@@ -42,11 +46,11 @@ export async function Header() {
   );
 
   return (
-    <header className="sticky top-0 z-30 border-b border-stone-200 bg-cream/90 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-stone-200/70 bg-cream/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
-        <Link href="/" className="flex items-center gap-2 font-display text-lg font-bold text-brand-700">
-          <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden><path d="M16 4 2 11l14 7 11-5.5V20h3v-9z" fill="currentColor" /><path d="M8 16v6c0 2 4 4 8 4s8-2 8-4v-6l-8 4z" fill="var(--color-trust-500)" /></svg>
-          {t("common.appName")}
+        <Link href="/" className="flex items-center gap-2.5 font-display text-xl font-bold tracking-tight text-stone-900">
+          <LogoMark size={34} />
+          <span>Fund<span className="text-brand-600">My</span>Degree</span>
         </Link>
         <nav className="hidden items-center gap-1 md:flex">
           {links.map((l) => <Link key={l.href} href={l.href} className="btn-ghost">{l.label}</Link>)}
