@@ -32,8 +32,11 @@ export function formatDate(value: string | Date, timeZone: string, locale = "en"
 
 export function formatDateTime(value: string | Date, timeZone: string, locale = "en"): string {
   return new Intl.DateTimeFormat(locale, {
-    dateStyle: "medium",
-    timeStyle: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
     timeZone: safeTimeZone(timeZone),
     timeZoneName: "short",
   }).format(new Date(value));

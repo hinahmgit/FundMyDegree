@@ -301,5 +301,6 @@ export async function renewSupport(_: ActionState, form: FormData): Promise<Acti
   const donation = await reserve({ grant, donorId: user.id, method: "platform", originalAmount: amount, originalCurrency: prev.original_currency, anonymous: prev.anonymous, provider: provider.name });
   if (isState(donation)) return donation;
   const result = await chargeReservation(user, donation, grant, { type: "saved", token: saved.token }, false);
-  return result.ok ? done("donate.renewed") : result;
+  if (!result.ok) return result;
+  redirect("/donor?renewed=1");
 }

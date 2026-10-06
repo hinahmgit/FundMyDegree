@@ -6,14 +6,15 @@ import { getDonorData } from "@/lib/donors";
 import { avatarUrl } from "@/lib/files";
 import { countryName } from "@/lib/format";
 import { convert } from "@/lib/fx/convert";
-import { Avatar, Badge, Card, EmptyState, PageHeader, StatCard, TableWrap } from "@/components/ui";
+import { Alert, Avatar, Badge, Card, EmptyState, PageHeader, StatCard, TableWrap } from "@/components/ui";
 import { DonationStatusBadge } from "@/components/status";
 import { Countdown } from "@/components/countdown";
 import { ActionForm, SubmitButton } from "@/components/forms";
 import { renewSupport } from "@/actions/donations";
 
-export default async function DonorDashboard() {
+export default async function DonorDashboard({ searchParams }: { searchParams: Promise<{ renewed?: string }> }) {
   const user = await requireRole("donor");
+  const { renewed } = await searchParams;
   const [t, f, data] = await Promise.all([getT(), getFormatter(), getDonorData(user.id)]);
   const given = data.donations.filter((d) => d.status === "confirmed" || d.status === "disbursed");
   const total = given.reduce((sum, d) => sum + (convert(Number(d.original_amount), d.original_currency, f.currency, f.rates) ?? 0), 0);
@@ -27,6 +28,7 @@ export default async function DonorDashboard() {
     <div className="space-y-6">
       <PageHeader title={t("donorDash.title")} actions={<Link href="/students" className="btn-primary">{t("donorDash.browse")}</Link>} />
 
+      {renewed && <Alert tone="success">{t("donate.renewed")}</Alert>}
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard label={t("donorDash.totalGiven")} value={f.money(total, f.currency)} sub={t("donorDash.totalGivenHint", { currency: f.currency })} />
         <StatCard label={t("donorDash.sponsored")} value={sponsoredIds.length} />

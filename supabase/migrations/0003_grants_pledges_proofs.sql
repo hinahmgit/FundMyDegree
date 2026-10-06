@@ -205,3 +205,6 @@ create policy "donations visible to donor and admins" on public.donations for se
 revoke execute on function public.reserve_donation from public, anon, authenticated;
 revoke execute on function public.refresh_grant_status from public, anon, authenticated;
 revoke execute on function public.expire_pledges from public, anon, authenticated;
+grant execute on function public.reserve_donation to service_role;
+grant execute on function public.refresh_grant_status to service_role;
+grant execute on function public.expire_pledges to service_role;

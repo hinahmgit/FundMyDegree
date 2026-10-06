@@ -51,7 +51,7 @@ export default async function AdminOverview() {
         <StatCard label={t("admin.stats.pendingProofs")} value={s.pendingProofs} />
         <StatCard label={t("admin.stats.studentsFunded")} value={s.studentsFunded} />
         <StatCard label={t("admin.stats.activeStudents")} value={s.activeStudents} sub={`${t("admin.stats.graduated")}: ${s.graduated}`} />
-        <StatCard label={t("admin.stats.donors")} value={s.donors} sub={`${s.registeredDonors} ${t("roles.donor").toLowerCase()}`} />
+        <StatCard label={t("admin.stats.donors")} value={s.donors} sub={t("admin.stats.registeredDonors", { count: s.registeredDonors })} />
         <StatCard label={t("admin.stats.countries")} value={s.countries} />
       </div>
 

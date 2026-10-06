@@ -1,5 +1,6 @@
 "use server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireRole } from "@/lib/auth";
 import { db } from "@/lib/supabase/admin";
@@ -26,7 +27,7 @@ const profileSchema = z.object({
   total_terms: z.coerce.number().int().min(1).max(20),
   expected_graduation: z.string().optional(),
   story: z.string().trim().max(2000).optional(),
-  total_degree_cost: z.coerce.number().min(0).max(1e10).optional(),
+  total_degree_cost: z.preprocess((v) => (v === "" || v === null ? undefined : v), z.coerce.number().min(0).max(1e10).optional()),
 });
 
 export async function saveStudentProfile(_: ActionState, form: FormData): Promise<ActionState> {
@@ -138,7 +139,7 @@ export async function submitForVerification(_state?: ActionState, _form?: FormDa
     .in("verification_status", ["draft", "rejected"]);
   if (error) return fail("common.unknownError");
   revalidatePath("/student", "layout");
-  return done("studentDash.submitted");
+  redirect("/student");
 }
 
 const resultsSchema = z.object({
@@ -187,7 +188,7 @@ export async function submitResults(_: ActionState, form: FormData): Promise<Act
   const term = grant.term_label ?? String(grant.term_number);
   await notifyMany(donors, "results_posted", { student: user.profile.full_name, term }, "/donor");
   revalidatePath("/student", "layout");
-  return done("results.submitted");
+  redirect("/student");
 }
 
 export async function postUpdate(_: ActionState, form: FormData): Promise<ActionState> {
